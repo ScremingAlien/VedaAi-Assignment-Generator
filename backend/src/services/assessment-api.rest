@@ -1,0 +1,100 @@
+@baseUrl = http://localhost:9000
+
+## Storing questin = Assessment
+## Ai will generate = Assignment
+
+###
+# Create Assignment
+# Save assignmentId from response
+POST {{baseUrl}}/assignment
+Content-Type: application/json
+
+{
+  "content": "JavaScript is a high-level programming language. Closures allow functions to access variables from outer scopes. Promises handle asynchronous operations. The Event Loop manages asynchronous execution.",
+  "questionTypes": [
+    {
+      "typeOfQuestion": "MCQ",
+      "questionCount": 5,
+      "marksPerQuestion": 1
+    },
+    {
+      "typeOfQuestion": "Short Answer",
+      "questionCount": 3,
+      "marksPerQuestion": 2
+    },
+    {
+      "typeOfQuestion": "Long Answer",
+      "questionCount": 2,
+      "marksPerQuestion": 5
+    }
+  ]
+}
+
+
+###
+# Assignment ID
+# Replace after create assignment
+@assignmentId = 6a2087e20be7df7c479e060b
+
+@assessmentId = 6a2087ead7acb9051df008e5
+
+###
+# Get Assessment By Assessment ID
+GET {{baseUrl}}/assessment/{{assessmentId}}
+
+###
+# Get Assessment By Assignment ID
+GET {{baseUrl}}/assessment/assignment/{{assignmentId}}
+
+###
+# Get ALl Assessments
+GET {{baseUrl}}/assessment
+
+
+
+# =======================================================
+
+###
+# Get Assignment By ID
+GET {{baseUrl}}/assignment
+
+###
+# Get Assignment status
+GET {{baseUrl}}/assignment/{{assignmentId}}/status
+
+
+
+
+
+
+
+
+
+
+
+# =================================================
+###
+# Get All Assignments
+GET {{baseUrl}}/assignment
+ 
+
+###
+# Get Assessment By Assessment ID
+# Replace after assessment generation
+
+GET {{baseUrl}}/assessment/{{assessmentId}}
+
+
+###
+# Get All Assessments
+GET {{baseUrl}}/assessment
+ 
+###
+# Get Assessment By Assignment ID
+GET {{baseUrl}}/assignment/{{assignmentId}}
+
+
+###
+# Check Generated Assessment
+#
+GET {{baseUrl}}/assessment/assignment/{{assignmentId}}

@@ -1,0 +1,274 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+interface ProgressEvent {
+  assignmentId: string;
+  percent: number;
+  step: string;
+}
+interface AssignmentStatusEvent {
+  assignmentId: string;
+  status: string;
+}
+
+interface AssignmentCompletedEvent {
+  assignmentId: string;
+  assessmentId: string;
+}
+
+interface AssignmentFailedEvent {
+  assignmentId: string;
+  message: string;
+}
+
+export default function Home() {
+  const [socket, setSocket] =
+    useState<Socket | null>(null);
+
+  const [progress, setProgress] =
+    useState(0);
+
+  const [step, setStep] =
+    useState("");
+  const [assignmentId, setAssignmentId] =
+    useState("");
+
+  const [status, setStatus] =
+    useState("Not Started");
+
+  const [assessmentId, setAssessmentId] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  useEffect(() => {
+    const socketInstance = io(
+      "http://localhost:9000"
+    );
+
+    setSocket(socketInstance);
+
+    socketInstance.on("connect", () => {
+      console.log(
+        "Connected:",
+        socketInstance.id
+      );
+    });
+    socketInstance.on(
+      "assignment:progress",
+      (
+        data: ProgressEvent
+      ) => {
+
+        setProgress(
+          data.percent
+        );
+
+        setStep(
+          data.step
+        );
+
+        console.log(data);
+      }
+    );
+    socketInstance.on(
+      "assignment:status",
+      (
+        data: AssignmentStatusEvent
+      ) => {
+        console.log(data);
+
+        setStatus(data.status);
+      }
+    );
+
+    socketInstance.on(
+      "assignment:completed",
+      (
+        data: AssignmentCompletedEvent
+      ) => {
+        console.log(data);
+
+        setStatus("COMPLETED");
+
+        setAssessmentId(
+          data.assessmentId
+        );
+      }
+    );
+
+    socketInstance.on(
+      "assignment:failed",
+      (
+        data: AssignmentFailedEvent
+      ) => {
+        console.log(data);
+
+        setStatus("FAILED");
+
+        setError(data.message);
+      }
+    );
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, []);
+
+  const createAssignment =
+    async () => {
+      try {
+        setError("");
+
+        const response =
+          await fetch(
+            "http://localhost:9000/assignment",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                content:
+                  "JavaScript is a high-level programming language. Closures allow functions to access variables from outer scopes. Promises handle asynchronous operations.",
+
+                questionTypes: [
+                  {
+                    typeOfQuestion:
+                      "MCQ",
+
+                    questionCount: 5,
+
+                    marksPerQuestion:
+                      1,
+                  },
+                ],
+              }),
+            }
+          );
+
+        const result =
+          await response.json();
+
+        const id =
+          result.data.assignmentId;
+
+        setAssignmentId(id);
+
+        setStatus("PENDING");
+
+        socket?.emit(
+          "assignment:join",
+          id
+        );
+      } catch (err) {
+        console.error(err);
+
+        setError(
+          "Failed to create assignment"
+        );
+      }
+    };
+
+  const fetchAssessment =
+    async () => {
+      if (!assignmentId) return;
+
+      const response =
+        await fetch(
+          `http://localhost:9000/assessment/assignment/${assignmentId}`
+        );
+
+      const result =
+        await response.json();
+
+      console.log(result);
+    };
+
+  return (
+    <main
+      style={{
+        padding: "2rem",
+      }}
+    >
+      <h1>
+        AI Assessment Generator
+      </h1>
+
+      <button
+        onClick={
+          createAssignment
+        }
+        className=" cursor-pointer"
+      >
+        Generate Assessment
+      </button>
+
+      <hr />
+
+      <p>
+        Assignment ID:
+        {" "}
+        {assignmentId || "-"}
+      </p>
+
+      <p>
+        Status:
+        {" "}
+        {status}
+      </p>
+      <div
+        style={{
+          width: "500px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: `${progress}%`,
+            height: "20px",
+            background: "green",
+            transition:
+              "width 300ms ease",
+          }}
+        />
+      </div>
+
+      <p>
+        {progress}%
+      </p>
+
+      <p>
+        {step}
+      </p>
+      <p>
+        Assessment ID:
+        {" "}
+        {assessmentId || "-"}
+      </p>
+
+      {error && (
+        <p>
+          Error:
+          {" "}
+          {error}
+        </p>
+      )}
+
+      <button
+        onClick={fetchAssessment}
+        disabled={!assignmentId}
+        className=" cursor-pointer"
+      >
+        Fetch Assessment
+      </button>
+    </main>
+  );
+}
