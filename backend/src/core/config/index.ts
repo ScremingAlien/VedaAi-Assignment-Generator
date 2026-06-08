@@ -27,4 +27,5 @@ export const config = {
   logger: loggerConfig,
 } as const;
 
+console.log('Config:', config);
 export type Config = typeof config;

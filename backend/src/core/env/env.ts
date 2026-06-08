@@ -43,8 +43,8 @@ class EnvManager {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
-    const ENV_FILE = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
-
+    const ENV_FILE = process.env.NODE_ENV == 'production' ? '.env.production' : '.env';
+    
     dotenv.config({
       path: path.resolve(__dirname, `../../../${ENV_FILE}`),
     });

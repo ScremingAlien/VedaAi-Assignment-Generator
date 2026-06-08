@@ -1,24 +1,15 @@
-FROM node:20-alpine AS builder
-
+FROM node:22-alpine AS base
 WORKDIR /app
-
 COPY package*.json ./
+
+FROM base AS development
+# Install all dependencies (including devDependencies like tsx, typescript)
 RUN npm install
-
 COPY . .
+CMD ["npm", "run", "dev"]
 
-WORKDIR /app/apps/backend
-
+FROM base AS production
+RUN npm ci --only=production
+COPY . .
 RUN npm run build
-
-
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/apps/backend/dist ./dist
-COPY --from=builder /app/apps/backend/package*.json ./
-
-RUN npm install --production
-
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start"]
