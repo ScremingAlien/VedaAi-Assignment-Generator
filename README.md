@@ -133,54 +133,6 @@ This installs dependencies for all workspace applications.
 
 ---
 
-# Environment Variables
-
-## Backend
-
-Create:
-
-```bash
-apps/backend/.env
-```
-
-Example:
-
-```env
-NODE_ENV="production"
-
-PORT=9000
-
-GOOGLE_API_KEY=""
-
-CORS_ORIGIN=http://localhost:3000
-
-MONGODB_URI=""
-
-REDIS_URL="" 
-
-OPENROUTER_API_KEY=""
-
-GROK_API_KEY=""
-```
-
----
-
-## Frontend
-
-Create:
-
-```bash
-apps/frontend/.env
-```
-
-Example:
-
-```env
-NEXT_PUBLIC_BACKEND_URL="http://localhost:9000"
-```
-
- 
- 
 
 # Development
 
