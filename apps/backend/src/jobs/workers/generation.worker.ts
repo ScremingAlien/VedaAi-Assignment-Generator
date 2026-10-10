@@ -26,6 +26,10 @@ const worker = new Worker(
 
   {
     connection: redis,
+    limiter: {
+      max: 20,
+      duration: 1000,
+    },
   },
 );
 

@@ -31,6 +31,7 @@ class MongooseDatabase extends DatabaseInterface<Mongoose> {
       }
 
       this.#connection = await mongoose.connect(this.uri, {
+        connectTimeoutMS: 15000,
         dbName: this.dbName,
       });
 

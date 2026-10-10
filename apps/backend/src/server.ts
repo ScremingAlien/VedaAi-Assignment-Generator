@@ -1,3 +1,7 @@
+import { setServers } from "node:dns";
+
+setServers(["8.8.8.8", "8.8.4.4"]);
+ 
 import { createServer } from 'http';
 
 import { createApp } from './app.js';
